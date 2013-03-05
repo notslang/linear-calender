@@ -1,13 +1,1 @@
-var moment = require("../../moment");
-
-exports.leapyear = {
-    "leap year" : function(test) {
-        test.expect(4);
-
-        test.equal(moment([2010, 0, 1]).isLeapYear(), false, '2010');
-        test.equal(moment([2100, 0, 1]).isLeapYear(), false, '2100');
-        test.equal(moment([2008, 0, 1]).isLeapYear(), true, '2008');
-        test.equal(moment([2000, 0, 1]).isLeapYear(), true, '2000');
-        test.done();
-    }
-};
+var moment=require("../../moment");exports.leapyear={"leap year":function(e){e.expect(4),e.equal(moment([2010,0,1]).isLeapYear(),!1,"2010"),e.equal(moment([2100,0,1]).isLeapYear(),!1,"2100"),e.equal(moment([2008,0,1]).isLeapYear(),!0,"2008"),e.equal(moment([2e3,0,1]).isLeapYear(),!0,"2000"),e.done()}};

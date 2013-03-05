@@ -1,12 +1,15 @@
 # Add scripts to load to this array. These can be loaded remotely like jquery
 # is below, or can use file paths, like '/components/jquery/jquery.min.js'
-js = [
-	"http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js",
-	"/components/moment/moment.js",
-]
+require.config(
+	paths:
+		jquery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min'
+		moment: "./../components/moment/moment"
+	shim:
+		moment: ['jquery']
+)
 
 # this will fire once the required scripts have been loaded
-require js, ->
+require ['jquery', 'moment'], ($, moment) ->
 	setInterval (-> $('#date').html moment().format('dddd, MMMM Do YYYY, h:mm:ss a')), 1000
 
 	day_width = 30 # in px
