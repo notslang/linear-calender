@@ -3,7 +3,7 @@
 require.config(
 	paths:
 		jquery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min'
-		moment: "./../components/moment/moment"
+		moment: "../components/moment/moment"
 	shim:
 		moment: ['jquery']
 )
