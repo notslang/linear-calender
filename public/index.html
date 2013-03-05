@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf8">
+    <title>Linear Calender</title>
+    <link rel="stylesheet" href="/css/master.css">
+  </head>
+  <body><span id="date"></span>
+<div id="calender"></div>
+  </body>
+  <script data-main="js/main" src="js/require.js"></script><script>protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://'; address = protocol + window.location.host + window.location.pathname + '/ws'; socket = new WebSocket(address);
+socket.onmessage = function(msg) { msg.data == 'reload' && window.location.reload() }</script>
+</html>

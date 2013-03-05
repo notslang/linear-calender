@@ -1,0 +1,18 @@
+.day {
+  width: 30px;
+  text-align: center;
+}
+.day,
+.month_name {
+  height: 30px;
+  line-height: 30px;
+  vertical-align: middle;
+}
+.month_name,
+.month,
+.day {
+  display: inline-block;
+}
+.month_name {
+  width: 80px;
+}
