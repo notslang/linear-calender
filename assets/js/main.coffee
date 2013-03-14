@@ -3,7 +3,7 @@
 require.config(
 	paths:
 		jquery: 'http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min'
-		moment: "../components/moment/moment"
+		moment: '../components/moment/moment'
 	shim:
 		moment: ['jquery']
 )
@@ -18,29 +18,28 @@ require ['jquery', 'moment'], ($, moment) ->
 	month = moment().endOf 'month'
 	max_days = 0
 	for i in [0...12]
-		month_name = month.format 'MMMM'
+		month_name = month.format 'MMM'
 		month_num = month.format 'M'
 		year = month.format 'YYYY'
 		days = +month.format 'D'
 		month.startOf('month')
 		start_day_offset = month.diff moment(month).startOf('week'), 'days'
 
-		#console.log
-		#	month_name: month_name
-		#	days: days
-		#	start_day_offset: start_day_offset
-
 		html += """
 			</br>
 			<div class="month_name">#{month_name}</div>
-			<div class="month" style="margin-left:#{start_day_offset*day_width}px">
+			<div class="month" style="margin-left:#{start_day_offset*day_width}px; width:#{(days-1)*day_width}px">
 		"""
 
 		if (days + start_day_offset) > max_days
 			max_days = days + start_day_offset
 
 		for day in [1...days]
-			html += "<div class=\"day\" id=\"#{day}/#{month_num}/#{year}\">#{day}</div>"
+			classes = ['day']
+			if moment("#{year}-#{month_num}-#{day}").isSame(moment(), 'day')
+				classes.push 'current'
+			console.log classes.join(' ')
+			html += "<span class=\"#{classes.join(' ')}\">#{day}</span>"
 
 		html += '</div>'
 
@@ -51,13 +50,13 @@ require ['jquery', 'moment'], ($, moment) ->
 	days = ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa']
 	i = e = 0
 	while i < max_days - 1
-		day_list += "<div class=\"day\">#{days[e]}</div>"
+		weekend = if days[e] in ['Su', 'Sa'] then ' weekend' else ''
+		day_list += "<span class=\"day#{weekend}\">#{days[e]}</span>"
 		e++
 		if e >= days.length then e = 0
 		i++
 
 	day_list = """
-	<div class="month_name"></div>
 	<div class="month" id="day_list">
 		#{day_list}
 	</div>

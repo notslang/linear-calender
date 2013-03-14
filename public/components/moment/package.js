@@ -1,1 +1,11 @@
-var profile={resourceTags:{ignore:function(e,t){return"moment/moment"!=t},amd:function(e){return/\.js$/.test(e)}}};
+var profile = {
+    resourceTags: {
+        ignore: function(filename, mid){
+            // only include moment/moment
+            return mid != "moment/moment";
+        },
+        amd: function(filename, mid){
+            return /\.js$/.test(filename);
+        }
+    }
+};

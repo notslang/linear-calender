@@ -1,1 +1,123 @@
-function check(){resolved===count&&(normalize(),display())}function makeBar(e){for(var t="";e>t.length;)t+="=";return t}function normalize(){var e,t=0,a=0;for(e=0;count>e;e++)t=Math.max(t,outputs[e].gzip),a=Math.max(a,outputs[e].original);for(e=0;count>e;e++)outputs[e].bargraph=makeBar(80*(outputs[e].gzip/t)),outputs[e].bargraph2=makeBar(80*(outputs[e].original/a))}function display(){var e;for(e=0;count>e;e++)console.log(outputs[e].version+" "+outputs[e].gzip+" "+outputs[e].original),console.log("gzip "+outputs[e].bargraph),console.log("orig "+outputs[e].bargraph2);done()}function getSizeAtVersion(e,t){var a="",n={},_=https.request({host:"raw.github.com",port:443,path:"/timrwood/moment/"+e+t},function(t){t.setEncoding("utf8"),t.on("data",function(e){a+=e}),t.on("end",function(){zlib.gzip(a,function(t,_){n.version=e,n.gzip=_.length,n.original=a.length,resolved++,check()})})});_.on("error",function(e){console.log("problem with request: "+e.message)}),_.end(),count++,outputs.push(n)}function getRemote(){var e,t="1.0.1 1.1.0 1.1.1 1.1.2 1.2.0 1.3.0 1.4.0".split(" "),a="1.5.0 1.5.1 1.6.0 1.6.1 1.7.0 1.7.1".split(" ");for(e=0;t.length>e;e++)getSizeAtVersion(t[e],"/moment.min.js");for(e=0;a.length>e;e++)getSizeAtVersion(a[e],"/min/moment.min.js")}function getLocal(){count++;var e={};outputs.push(e),fs.readFile(path.normalize(__dirname+"/../min/moment.min.js"),"utf8",function(t,a){if(t)throw t;zlib.gzip(a,function(t,n){e.version=".next",e.gzip=n.length,e.original=a.length,resolved++,check()})})}var https=require("https"),zlib=require("zlib"),path=require("path"),fs=require("fs"),count=0,resolved=0,outputs=[],done;module.exports=function(e){e.registerTask("history","Check the codebase filesize over different releases.",function(){done=this.async(),getRemote(),getLocal()})};
+var https = require("https"),
+    zlib = require('zlib'),
+    path = require('path'),
+    fs = require('fs');
+
+var count = 0;
+var resolved = 0;
+
+var outputs = [];
+
+var done;
+
+function check() {
+    if (resolved === count) {
+        normalize();
+        display();
+    }
+}
+
+function makeBar(length) {
+    var i = '';
+    while (i.length < length) {
+        i += '=';
+    }
+    return i;
+}
+
+function normalize() {
+    var i, 
+        max = 0,
+        max2 = 0;
+    for (i = 0; i < count; i ++) {
+        max = Math.max(max, outputs[i].gzip);
+        max2 = Math.max(max2, outputs[i].original);
+    }
+    for (i = 0; i < count; i ++) {
+        outputs[i].bargraph = makeBar((outputs[i].gzip / max) * 80);
+        outputs[i].bargraph2 = makeBar((outputs[i].original / max2) * 80);
+    }
+}
+
+function display() {
+    var i;
+    for (i = 0; i < count; i ++) {
+        console.log(outputs[i].version + ' ' + outputs[i].gzip + ' ' + outputs[i].original);
+        console.log('gzip ' + outputs[i].bargraph);
+        console.log('orig ' + outputs[i].bargraph2);
+    }
+    done();
+}
+
+function getSizeAtVersion(version, path) {
+    var data = '',
+        op = {},
+
+        req = https.request({
+        host: 'raw.github.com',
+        port: 443,
+        path: '/timrwood/moment/' + version + path
+    }, function (res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            data += chunk;
+        });
+        res.on('end', function (e) {
+            zlib.gzip(data, function (error, result) {
+                op.version = version;
+                op.gzip = result.length;
+                op.original = data.length;
+                resolved ++;
+                check();
+            });
+        });
+    });
+
+    req.on('error', function (e) {
+        console.log('problem with request: ' + e.message);
+    });
+    req.end();
+    count++;
+    outputs.push(op);
+}
+
+function getRemote() {
+    var old_versions = '1.0.1 1.1.0 1.1.1 1.1.2 1.2.0 1.3.0 1.4.0'.split(' '),
+        new_versions = '1.5.0 1.5.1 1.6.0 1.6.1 1.7.0 1.7.1'.split(' '),
+        i;
+
+    for (i = 0; i < old_versions.length; i++) {
+        getSizeAtVersion(old_versions[i], '/moment.min.js');
+    }
+    for (i = 0; i < new_versions.length; i++) {
+        getSizeAtVersion(new_versions[i], '/min/moment.min.js');
+    }
+}
+
+function getLocal() {
+    count ++;
+    var op = {};
+    outputs.push(op);
+    fs.readFile(path.normalize(__dirname + '/../min/moment.min.js'), 'utf8', function (err, data) {
+        if (err) {
+            throw err;
+        }
+        zlib.gzip(data, function (error, result) {
+            op.version = '.next';
+            op.gzip = result.length;
+            op.original = data.length;
+            resolved ++;
+            check();
+        });
+    });
+}
+
+
+
+module.exports = function (grunt) {
+    grunt.registerTask('history', 'Check the codebase filesize over different releases.', function () {
+        done = this.async();
+        getRemote();
+        getLocal();
+    });
+};

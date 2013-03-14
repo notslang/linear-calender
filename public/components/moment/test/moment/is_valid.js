@@ -1,1 +1,164 @@
-var moment=require("../../moment");exports.is_valid={"array bad month":function(e){e.expect(2),e.equal(moment([2010,-1]).isValid(),!1,"month -1"),e.equal(moment([2100,12]).isValid(),!1,"month 12"),e.done()},"array good month":function(e){e.expect(24);for(var a=0;12>a;a++)e.equal(moment([2010,a]).isValid(),!0,"month "+a),e.equal(moment.utc([2010,a]).isValid(),!0,"month "+a);e.done()},"array bad date":function(e){e.expect(4),e.equal(moment([2010,0,0]).isValid(),!1,"date 0"),e.equal(moment([2100,0,32]).isValid(),!1,"date 32"),e.equal(moment.utc([2010,0,0]).isValid(),!1,"utc date 0"),e.equal(moment.utc([2100,0,32]).isValid(),!1,"utc date 32"),e.done()},"array bad date leap year":function(e){e.expect(8),e.equal(moment([2010,1,29]).isValid(),!1,"2010 feb 29"),e.equal(moment([2100,1,29]).isValid(),!1,"2100 feb 29"),e.equal(moment([2008,1,30]).isValid(),!1,"2008 feb 30"),e.equal(moment([2e3,1,30]).isValid(),!1,"2000 feb 30"),e.equal(moment.utc([2010,1,29]).isValid(),!1,"utc 2010 feb 29"),e.equal(moment.utc([2100,1,29]).isValid(),!1,"utc 2100 feb 29"),e.equal(moment.utc([2008,1,30]).isValid(),!1,"utc 2008 feb 30"),e.equal(moment.utc([2e3,1,30]).isValid(),!1,"utc 2000 feb 30"),e.done()},"string + formats bad date":function(e){e.expect(9),e.equal(moment("2020-00-00",["YYYY-MM-DD","DD-MM-YYYY"]).isValid(),!1,"invalid on all in array"),e.equal(moment("2020-00-00",["DD-MM-YYYY","YYYY-MM-DD"]).isValid(),!1,"invalid on all in array"),e.equal(moment("2020-01-01",["YYYY-MM-DD","DD-MM-YYYY"]).isValid(),!0,"valid on first"),e.equal(moment("2020-01-01",["DD-MM-YYYY","YYYY-MM-DD"]).isValid(),!0,"valid on last"),e.equal(moment("2020-01-01",["YYYY-MM-DD","YYYY-DD-MM"]).isValid(),!0,"valid on both"),e.equal(moment("2020-13-01",["YYYY-MM-DD","YYYY-DD-MM"]).isValid(),!0,"valid on last"),e.equal(moment("12-13-2012",["DD-MM-YYYY","YYYY-MM-DD"]).isValid(),!1,"month rollover"),e.equal(moment("12-13-2012",["DD-MM-YYYY","DD-MM-YYYY"]).isValid(),!1,"month rollover"),e.equal(moment("38-12-2012",["DD-MM-YYYY"]).isValid(),!1,"day rollover"),e.done()},"string nonsensical":function(e){e.expect(1),e.equal(moment("fail").isValid(),!1,'string "fail"'),e.done()},"string nonsensical with format":function(e){e.expect(2),e.equal(moment("fail","MM-DD-YYYY").isValid(),!1,'string "fail" with format "MM-DD-YYYY"'),e.equal(moment("xx-xx-2001","DD-MM-YYY").isValid(),!1,'string "xx-xx-2001" with format "MM-DD-YYYY"'),e.done()},"string with bad month name":function(e){e.expect(2),moment.lang("en"),e.equal(moment("01-Nam-2012","DD-MMM-YYYY").isValid(),!1,'"Nam" is an invalid month'),e.equal(moment("01-Aug-2012","DD-MMM-YYYY").isValid(),!0,'"Aug" is a valid month'),e.done()},"string with spaceless format":function(e){e.expect(1),e.equal(moment("10Sep2001","DDMMMYYYY").isValid(),!0,"Parsing 10Sep2001 should result in a valid date"),e.done()},"invalid string iso 8601":function(e){var a=["2010-00-00","2010-01-00","2010-01-40","2010-01-01T24","2010-01-01T23:60","2010-01-01T23:59:60"];e.expect(2*a.length);for(var o=0;a.length>o;o++)e.equal(moment(a[o]).isValid(),!1,a[o]+" should be invalid"),e.equal(moment.utc(a[o]).isValid(),!1,a[o]+" should be invalid");e.done()},"invalid string iso 8601 + timezone":function(e){var a=["2010-00-00+00:00","2010-01-00+00:00","2010-01-40+00:00","2010-01-40T24+00:00","2010-01-40T23:60+00:00","2010-01-40T23:59:60+00:00","2010-01-40T23:59:59.9999+00:00"];e.expect(2*a.length);for(var o=0;a.length>o;o++)e.equal(moment(a[o]).isValid(),!1,a[o]+" should be invalid"),e.equal(moment.utc(a[o]).isValid(),!1,a[o]+" should be invalid");e.done()},"valid string iso 8601 + timezone":function(e){var a=["2010-01-01","2010-01-30","2010-01-30T23+00:00","2010-01-30T23:59+00:00","2010-01-30T23:59:59+00:00","2010-01-30T23:59:59.999+00:00","2010-01-30T23:59:59.999-07:00","2010-01-30T00:00:00.000+07:00"];e.expect(2*a.length);for(var o=0;a.length>o;o++)e.equal(moment(a[o]).isValid(),!0,a[o]+" should be valid"),e.equal(moment.utc(a[o]).isValid(),!0,a[o]+" should be valid");e.done()}};
+var moment = require("../../moment");
+
+exports.is_valid = {
+    "array bad month" : function (test) {
+        test.expect(2);
+
+        test.equal(moment([2010, -1]).isValid(), false, 'month -1');
+        test.equal(moment([2100, 12]).isValid(), false, 'month 12');
+
+        test.done();
+    },
+
+    "array good month" : function (test) {
+        test.expect(24);
+
+        for (var i = 0; i < 12; i++) {
+            test.equal(moment([2010, i]).isValid(), true, 'month ' + i);
+            test.equal(moment.utc([2010, i]).isValid(), true, 'month ' + i);
+        }
+
+        test.done();
+    },
+
+    "array bad date" : function (test) {
+        test.expect(4);
+
+        test.equal(moment([2010, 0, 0]).isValid(), false, 'date 0');
+        test.equal(moment([2100, 0, 32]).isValid(), false, 'date 32');
+
+        test.equal(moment.utc([2010, 0, 0]).isValid(), false, 'utc date 0');
+        test.equal(moment.utc([2100, 0, 32]).isValid(), false, 'utc date 32');
+
+        test.done();
+    },
+
+    "array bad date leap year" : function (test) {
+        test.expect(8);
+
+        test.equal(moment([2010, 1, 29]).isValid(), false, '2010 feb 29');
+        test.equal(moment([2100, 1, 29]).isValid(), false, '2100 feb 29');
+        test.equal(moment([2008, 1, 30]).isValid(), false, '2008 feb 30');
+        test.equal(moment([2000, 1, 30]).isValid(), false, '2000 feb 30');
+
+        test.equal(moment.utc([2010, 1, 29]).isValid(), false, 'utc 2010 feb 29');
+        test.equal(moment.utc([2100, 1, 29]).isValid(), false, 'utc 2100 feb 29');
+        test.equal(moment.utc([2008, 1, 30]).isValid(), false, 'utc 2008 feb 30');
+        test.equal(moment.utc([2000, 1, 30]).isValid(), false, 'utc 2000 feb 30');
+
+        test.done();
+    },
+
+    "string + formats bad date" : function (test) {
+        test.expect(9);
+
+        test.equal(moment('2020-00-00', ['YYYY-MM-DD', 'DD-MM-YYYY']).isValid(), false, 'invalid on all in array');
+        test.equal(moment('2020-00-00', ['DD-MM-YYYY', 'YYYY-MM-DD']).isValid(), false, 'invalid on all in array');
+        test.equal(moment('2020-01-01', ['YYYY-MM-DD', 'DD-MM-YYYY']).isValid(), true, 'valid on first');
+        test.equal(moment('2020-01-01', ['DD-MM-YYYY', 'YYYY-MM-DD']).isValid(), true, 'valid on last');
+        test.equal(moment('2020-01-01', ['YYYY-MM-DD', 'YYYY-DD-MM']).isValid(), true, 'valid on both');
+        test.equal(moment('2020-13-01', ['YYYY-MM-DD', 'YYYY-DD-MM']).isValid(), true, 'valid on last');
+
+        test.equal(moment('12-13-2012', ['DD-MM-YYYY', 'YYYY-MM-DD']).isValid(), false, 'month rollover');
+        test.equal(moment('12-13-2012', ['DD-MM-YYYY', 'DD-MM-YYYY']).isValid(), false, 'month rollover');
+        test.equal(moment('38-12-2012', ['DD-MM-YYYY']).isValid(), false, 'day rollover');
+
+        test.done();
+    },
+
+    "string nonsensical" : function (test) {
+        test.expect(1);
+
+        test.equal(moment('fail').isValid(), false, 'string "fail"');
+        test.done();
+    },
+
+    "string nonsensical with format" : function (test) {
+        test.expect(2);
+
+        test.equal(moment('fail', "MM-DD-YYYY").isValid(), false, 'string "fail" with format "MM-DD-YYYY"');
+        test.equal(moment("xx-xx-2001", 'DD-MM-YYY').isValid(), false, 'string "xx-xx-2001" with format "MM-DD-YYYY"');
+        test.done();
+    },
+
+    "string with bad month name" : function (test) {
+        test.expect(2);
+
+        moment.lang('en');
+
+        test.equal(moment('01-Nam-2012', 'DD-MMM-YYYY').isValid(), false, '"Nam" is an invalid month');
+        test.equal(moment('01-Aug-2012', 'DD-MMM-YYYY').isValid(), true, '"Aug" is a valid month');
+
+        test.done();
+    },
+
+    "string with spaceless format" : function (test) {
+        test.expect(1);
+
+        test.equal(moment('10Sep2001', 'DDMMMYYYY').isValid(), true, "Parsing 10Sep2001 should result in a valid date");
+
+        test.done();
+    },
+
+    "invalid string iso 8601" : function (test) {
+
+        var tests = [
+            '2010-00-00',
+            '2010-01-00',
+            '2010-01-40',
+            '2010-01-01T24',
+            '2010-01-01T23:60',
+            '2010-01-01T23:59:60'
+        ];
+
+        test.expect(tests.length * 2);
+
+        for (var i = 0; i < tests.length; i++) {
+            test.equal(moment(tests[i]).isValid(), false, tests[i] + ' should be invalid');
+            test.equal(moment.utc(tests[i]).isValid(), false, tests[i] + ' should be invalid');
+        }
+        test.done();
+    },
+
+    "invalid string iso 8601 + timezone" : function (test) {
+
+        var tests = [
+            '2010-00-00+00:00',
+            '2010-01-00+00:00',
+            '2010-01-40+00:00',
+            '2010-01-40T24+00:00',
+            '2010-01-40T23:60+00:00',
+            '2010-01-40T23:59:60+00:00',
+            '2010-01-40T23:59:59.9999+00:00'
+        ];
+
+        test.expect(tests.length * 2);
+
+        for (var i = 0; i < tests.length; i++) {
+            test.equal(moment(tests[i]).isValid(), false, tests[i] + ' should be invalid');
+            test.equal(moment.utc(tests[i]).isValid(), false, tests[i] + ' should be invalid');
+        }
+        test.done();
+    },
+
+    "valid string iso 8601 + timezone" : function (test) {
+        var tests = [
+            '2010-01-01',
+            '2010-01-30',
+            '2010-01-30T23+00:00',
+            '2010-01-30T23:59+00:00',
+            '2010-01-30T23:59:59+00:00',
+            '2010-01-30T23:59:59.999+00:00',
+            '2010-01-30T23:59:59.999-07:00',
+            '2010-01-30T00:00:00.000+07:00'
+        ];
+
+        test.expect(tests.length * 2);
+
+        for (var i = 0; i < tests.length; i++) {
+            test.equal(moment(tests[i]).isValid(), true, tests[i] + ' should be valid');
+            test.equal(moment.utc(tests[i]).isValid(), true, tests[i] + ' should be valid');
+        }
+        test.done();
+    }
+};

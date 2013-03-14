@@ -1,1 +1,104 @@
-var path=require("path"),nodeunit=require("nodeunit"),moment=require("../moment");module.exports=function(e){function t(){s(d,function(){e.log.writeln("Resetting timezone back to "+d),o()})}function a(t){e.utils.spawn({cmd:"systemsetup",args:["gettimezone"]},function(e,a){t(a.stdout.replace("Time Zone: ",""))})}function n(t){e.utils.spawn({cmd:"systemsetup",args:["listtimezones"]},function(e,a){var n=a.stdout.replace("Time Zones:","");n=n.match(/\S+/g),t(n)})}function s(t,a){e.utils.spawn({cmd:"systemsetup",args:["settimezone",t]},function(){a()})}function _(e){var t=i.pop();t?s(t,function(){r(t,function(){_(e)})}):e()}function r(a,n){e.utils.spawn({cmd:"grunt",args:["zone"]},function(e,a){if(e)throw t(),e;console.log(a.stdout),n()})}var i,d,o;e.registerTask("zones","Run the unit tests in different timezones.",function(){o=this.async(),a(function(e){d=e,n(function(e){i=e,_(function(){t()})})})})};
+var path = require('path'),
+    nodeunit = require('nodeunit'),
+    moment = require('../moment');
+
+
+module.exports = function (grunt) {
+    // placeholder for an array of timezones
+    var ALL_ZONES,
+        INITIAL_ZONE,
+
+        done;
+
+    /******************************
+        Grunt task
+    ******************************/
+
+    grunt.registerTask('zones', 'Run the unit tests in different timezones.', function () {
+        done = this.async();
+        getCurrentTimezone(function (zone) {
+            // save the initial timezone so we dont break our computers
+            INITIAL_ZONE = zone;
+            getAllTimezones(function (zones) {
+                // store all the timezones
+                ALL_ZONES = zones;
+                // start running the tests
+                nextTest(function () {
+                    // reset the timezone like nothing ever happened
+                    resetTimezone();
+                });
+            });
+        });
+    });
+
+    /******************************
+        Timezones
+    ******************************/
+
+    function resetTimezone() {
+        setTimezone(INITIAL_ZONE, function () {
+            grunt.log.writeln("Resetting timezone back to " + INITIAL_ZONE);
+            done();
+        });
+    }
+
+    function getCurrentTimezone(cb) {
+        grunt.utils.spawn({
+            cmd: "systemsetup",
+            args: ["gettimezone"]
+        }, function (err, result, code) {
+            cb(result.stdout.replace('Time Zone: ', ''));
+        });
+    }
+
+    function getAllTimezones(cb) {
+        grunt.utils.spawn({
+            cmd: "systemsetup",
+            args: ["listtimezones"]
+        }, function (err, result, code) {
+            var zones = result.stdout.replace('Time Zones:', '');
+            zones = zones.match(/\S+/g);
+            cb(zones);
+        });
+    }
+
+    function setTimezone(zone, cb) {
+        grunt.utils.spawn({
+            cmd: "systemsetup",
+            args: ["settimezone", zone]
+        }, function (err, result, code) {
+            cb();
+        });
+    }
+
+    /******************************
+        Tests
+    ******************************/
+
+    function nextTest(cb) {
+        var zone = ALL_ZONES.pop();
+        if (zone) {
+            setTimezone(zone, function () {
+                testZone(zone, function () {
+                    nextTest(cb);
+                });
+            });
+        } else {
+            cb();
+        }
+    }
+
+    function testZone(zone, cb) {
+        grunt.utils.spawn({
+            cmd: "grunt",
+            args: ["zone"]
+        }, function (err, result, code) {
+            if (err) {
+                resetTimezone();
+                throw err;
+            }
+            console.log(result.stdout);
+            cb();
+        });
+    }
+};

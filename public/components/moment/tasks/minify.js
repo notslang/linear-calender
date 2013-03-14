@@ -1,1 +1,53 @@
-var fs=require("fs"),uglifyjs=require("uglify-js");module.exports=function(e){function a(e){var a,t,n="";for(a=0;e.length>a;++a)t=e[a],n+="comment1"===t.type?"//"+t.value+"\n":"/*"+t.value+"*/";return n}e.registerMultiTask("minwithcomments","Minify lang files with UglifyJS.",function(){var t,n,_,s=e.file.expandFiles(this.file.src);return n=e.helper("concat",s,{separator:this.data.separator}),_=uglifyjs.parser.tokenizer(n),t=a(_().comments_before),t+=e.helper("uglify",n,e.config("uglify")),e.file.write(this.file.dest,t),this.errorCount?!1:(e.log.writeln('File "'+this.file.dest+'" created.'),e.helper("min_max_info",t,n),void 0)})};
+/*jshint onevar:false*/
+
+var fs = require('fs'),
+    uglifyjs = require('uglify-js');
+
+
+module.exports = function (grunt) {
+
+    // UglifyJS does not support keeping the first line comments unless using the CLI.
+    // This multi-task ensures that the first comments are kept.
+    grunt.registerMultiTask('minwithcomments', 'Minify lang files with UglifyJS.', function () {
+        var files = grunt.file.expandFiles(this.file.src),
+            min,
+            code,
+            comments,
+            tok;
+
+        // Concat specified files. This should really be a single, pre-built (and
+        // linted) file, but it supports any number of files.
+        code = grunt.helper('concat', files, {separator: this.data.separator});
+
+        // Add the first comments
+        tok = uglifyjs.parser.tokenizer(code);
+        min = showCopyright(tok().comments_before);
+
+        // Add the minified source.
+        min += grunt.helper('uglify', code, grunt.config('uglify'));
+        grunt.file.write(this.file.dest, min);
+
+        // Fail task if errors were logged.
+        if (this.errorCount) { return false; }
+
+        // Otherwise, print a success message....
+        grunt.log.writeln('File "' + this.file.dest + '" created.');
+
+        // ...and report some size information.
+        grunt.helper('min_max_info', min, code);
+    });
+
+    // Helper for the 'mincomment' multitask
+    function showCopyright(comments) {
+        var ret = "", i, c;
+        for (i = 0; i < comments.length; ++i) {
+            c = comments[i];
+            if (c.type === "comment1") {
+                ret += "//" + c.value + "\n";
+            } else {
+                ret += "/*" + c.value + "*/";
+            }
+        }
+        return ret;
+    }
+};

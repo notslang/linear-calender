@@ -1,16 +1,64 @@
 day_width = 30px
+month_name_width = 40px
+
+@font-face
+	font-family: 'SanchezSlab'
+	src: url('../webfonts/262E8F_0_0.eot')
+	src:
+		url('../webfonts/262E8F_0_0.eot?#iefix') format('embedded-opentype'),
+		url('../webfonts/262E8F_0_0.woff') format('woff'),
+		url('../webfonts/262E8F_0_0.ttf') format('truetype')
+
+body
+	background-image url('../img/fabric_of_squares_gray.png')
+
+#calender
+	margin-top 10px
+	padding-top day_width
+	position relative
+	font-size 0
+
+#day_list
+	margin 0 1px
+	border none
+	position absolute
+	top 0
+	left month_name_width
+	height 100%
+	z-index -2
+
+	.day
+		height 100%
+		width day_width - 1px
+		margin-left 1px
+
+	.weekend
+		background rgba(204, 204, 204, 0.5)
 
 .day
 	width day_width
 	text-align center
+	border-radius (day_width / 2)
 
 .day, .month_name
+	font-size 14px
+	font-family SanchezSlab
 	height day_width
-	line-height day_width
+	line-height day_width + 5px
 	vertical-align middle
+	text-transform uppercase
+	color rgba(0,0,0,0.6)
+	whitespace nowrap
 
 .month_name, .month, .day
 	display inline-block
 
+.month
+	border 2px groove
+	border-radius (day_width / 2)
+	margin-top day_width
+
 .month_name
-	width 80px
+	font-weight bold
+	width month_name_width
+
