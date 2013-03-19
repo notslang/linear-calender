@@ -1,6 +1,8 @@
 day_width = 30px
 month_name_width = 40px
 
+text_color = rgba(200, 200, 200, 0.6)
+
 @font-face
 	font-family: 'SanchezSlab'
 	src: url('../webfonts/262E8F_0_0.eot')
@@ -10,11 +12,15 @@ month_name_width = 40px
 		url('../webfonts/262E8F_0_0.ttf') format('truetype')
 
 body
-	background-image url('../img/fabric_of_squares_gray.png')
+	font-family SanchezSlab
+	color text_color
+	background-image url('../img/dark_fish_skin.png')
+	font-size 14px
 
 #calender
 	margin-top 10px
 	padding-top day_width
+	padding-bottom day_width * 2
 	position relative
 	font-size 0
 
@@ -33,30 +39,33 @@ body
 		margin-left 1px
 
 	.weekend
-		background rgba(204, 204, 204, 0.5)
+		background rgba(204, 204, 204, 0.2)
 
 .day
 	width day_width
 	text-align center
 	border-radius (day_width / 2)
 
+.current
+	background-color rgba(50, 50, 50, 0.5)
+	box-shadow 0px 1px 0px rgba(255,255,255,.3), 0px -1px 0px rgba(0,0,0,.7)
+
 .day, .month_name
-	font-size 14px
-	font-family SanchezSlab
 	height day_width
+	font-size 14px
 	line-height day_width + 5px
 	vertical-align middle
 	text-transform uppercase
-	color rgba(0,0,0,0.6)
 	whitespace nowrap
 
 .month_name, .month, .day
 	display inline-block
 
 .month
-	border 2px groove
+	border 1px solid text_color //rgba(250, 250, 250, 0.7)
 	border-radius (day_width / 2)
 	margin-top day_width
+	box-shadow(3px)
 
 .month_name
 	font-weight bold
