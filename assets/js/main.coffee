@@ -38,6 +38,8 @@ require ['jquery', 'moment'], ($, moment) ->
 			classes = ['day']
 			if moment("#{year}-#{month_num}-#{day}").isSame(moment(), 'day')
 				classes.push 'current'
+			else if moment("#{year}-#{month_num}-#{day}").isBefore(moment(), 'day')
+				classes.push 'past'
 			console.log classes.join(' ')
 			html += "<span class=\"#{classes.join(' ')}\">#{day}</span>"
 

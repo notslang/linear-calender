@@ -1,7 +1,8 @@
 day_width = 30px
-month_name_width = 40px
+month_name_width = 65px
 
 text_color = rgba(200, 200, 200, 0.6)
+text_shadow = 1px 1px 4px black, -1px -1px 4px black
 
 @font-face
 	font-family: 'SanchezSlab'
@@ -23,6 +24,67 @@ body
 	padding-bottom day_width * 2
 	position relative
 	font-size 0
+	white-space nowrap
+
+.day
+	width day_width
+	text-align center
+	border-radius (day_width / 2)
+	text-shadow text_shadow
+
+.day, .month_name
+	height day_width
+	font-size 14px
+	line-height day_width + 5px
+	vertical-align middle
+	text-transform uppercase
+
+.month_name, .month, .day
+	display inline-block
+
+.current
+	margin_width = 2px
+	circle_diameter = day_width - margin_width * 2
+	line-height circle_diameter + 5px
+	height circle_diameter
+	width circle_diameter
+	margin margin_width
+	background-color rgba(50, 50, 50, 0.5)
+	box-shadow 0px 1px 0px rgba(255,255,255,.3), 0px -1px 0px rgba(0,0,0,.7)
+
+.past
+	position relative
+	color rgba(200, 200, 200, 0.45)
+	text-shadow none
+
+	&:after
+		content '╲'
+		color text_color
+		text-shadow text_shadow
+		font-family 'sans-serif'
+		font-size 15px
+		display block
+		position absolute
+		top -3px
+		left 0
+		width day_width
+
+.month
+	shadow = 0 0 4px 1px black
+	box-shadow shadow, inset shadow
+	border 1px solid text_color
+	border-radius (day_width / 2)
+
+.month_name
+	right_margin = 10px
+	width month_name_width - right_margin
+	row_height = day_width * 2.5
+	height row_height
+	line-height row_height + 12px
+	margin-right right_margin
+	font-size 21px
+	font-weight bold
+	text-align right
 
 #day_list
 	margin 0 1px
@@ -32,42 +94,15 @@ body
 	left month_name_width
 	height 100%
 	z-index -2
+	box-shadow none
 
 	.day
 		height 100%
 		width day_width - 1px
 		margin-left 1px
+		text-shadow none
+		font-size 10px
 
 	.weekend
-		background rgba(204, 204, 204, 0.2)
-
-.day
-	width day_width
-	text-align center
-	border-radius (day_width / 2)
-
-.current
-	background-color rgba(50, 50, 50, 0.5)
-	box-shadow 0px 1px 0px rgba(255,255,255,.3), 0px -1px 0px rgba(0,0,0,.7)
-
-.day, .month_name
-	height day_width
-	font-size 14px
-	line-height day_width + 5px
-	vertical-align middle
-	text-transform uppercase
-	whitespace nowrap
-
-.month_name, .month, .day
-	display inline-block
-
-.month
-	border 1px solid text_color //rgba(250, 250, 250, 0.7)
-	border-radius (day_width / 2)
-	margin-top day_width
-	box-shadow(3px)
-
-.month_name
-	font-weight bold
-	width month_name_width
+		background rgba(204, 204, 204, 0.15)
 
